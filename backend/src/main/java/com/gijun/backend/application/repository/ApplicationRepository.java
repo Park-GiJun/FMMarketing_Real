@@ -14,11 +14,17 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository for Application entity
+ * This is the primary implementation - all other ApplicationRepository interfaces should be removed
+ */
 @Repository
 public interface ApplicationRepository extends JpaRepository<Application, ApplicationId> {
     Page<Application> findByCampaignId(CampaignId campaignId, Pageable pageable);
     
     List<Application> findByBloggerId(UserId bloggerId);
+    
+    Page<Application> findByBloggerId(UserId bloggerId, Pageable pageable);
     
     Optional<Application> findByBloggerIdAndCampaignId(UserId bloggerId, CampaignId campaignId);
     
@@ -32,4 +38,7 @@ public interface ApplicationRepository extends JpaRepository<Application, Applic
     int countByCampaignIdAndStatusAndReviewUrlIsNotNull(CampaignId campaignId, ApplicationStatus status);
     
     List<Application> findByCampaignIdAndStatus(CampaignId campaignId, ApplicationStatus status);
+    
+    Page<Application> findByCampaignIdAndStatusAndReviewUrlIsNotNull(
+            CampaignId campaignId, ApplicationStatus status, Pageable pageable);
 }
