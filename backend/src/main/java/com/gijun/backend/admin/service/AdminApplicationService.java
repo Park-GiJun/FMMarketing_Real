@@ -1,9 +1,14 @@
 package com.gijun.backend.admin.service;
 
 import com.gijun.backend.admin.dto.ApplicationStatusRequest;
+import com.gijun.backend.admin.model.Campaign;
+import com.gijun.backend.admin.model.id.CampaignId;
+import com.gijun.backend.admin.repository.CampaignRepository;
 import com.gijun.backend.blogger.dto.ApplicationResponse;
 import com.gijun.backend.blogger.model.Application;
+import com.gijun.backend.blogger.model.id.ApplicationId;
 import com.gijun.backend.blogger.repository.ApplicationRepository;
+import com.gijun.backend.common.exception.BadRequestException;
 import com.gijun.backend.common.exception.ResourceNotFoundException;
 import com.gijun.backend.common.model.User;
 import com.gijun.backend.common.repository.UserRepository;
@@ -18,29 +23,50 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminApplicationService {
 
     private final ApplicationRepository applicationRepository;
+    private final CampaignRepository campaignRepository;
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public Page<ApplicationResponse> getCampaignApplications(Long campaignId, Pageable pageable) {
+    public Page<ApplicationResponse> getCampaignApplications(CampaignId campaignId, Pageable pageable) {
+        // Validate campaign exists
+        Campaign campaign = campaignRepository.findByIdAndDeletedFalse(campaignId)
+                .orElseThrow(() -> new ResourceNotFoundException("Campaign", "id", campaignId));
+                
         Page<Application> applications = applicationRepository.findByCampaignId(campaignId, pageable);
-        return applications.map(this::convertToResponse);
+        return applications.map(application -> convertToResponse(application, campaign));
     }
 
     @Transactional
-    public ApplicationResponse updateApplicationStatus(Long applicationId, ApplicationStatusRequest request) {
+    public ApplicationResponse updateApplicationStatus(ApplicationId applicationId, ApplicationStatusRequest request) {
         Application application = applicationRepository.findById(applicationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Application", "id", applicationId));
 
-        application.setStatus(Application.Status.valueOf(request.getStatus()));
-        if (request.getReason() != null) {
-            application.setRejectionReason(request.getReason());
+        // Validate status
+        try {
+            Application.Status newStatus = Application.Status.valueOf(request.getStatus());
+            
+            if (newStatus == Application.Status.REJECTED && (request.getReason() == null || request.getReason().trim().isEmpty())) {
+                throw new BadRequestException("Rejection reason is required when rejecting an application");
+            }
+            
+            application.setStatus(newStatus);
+            
+            if (newStatus == Application.Status.REJECTED) {
+                application.setRejectionReason(request.getReason());
+            }
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid status: " + request.getStatus());
         }
 
         Application updatedApplication = applicationRepository.save(application);
-        return convertToResponse(updatedApplication);
+        
+        Campaign campaign = campaignRepository.findById(application.getCampaignId())
+                .orElseThrow(() -> new ResourceNotFoundException("Campaign", "id", application.getCampaignId()));
+                
+        return convertToResponse(updatedApplication, campaign);
     }
 
-    private ApplicationResponse convertToResponse(Application application) {
+    private ApplicationResponse convertToResponse(Application application, Campaign campaign) {
         User blogger = userRepository.findById(application.getBloggerId())
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", application.getBloggerId()));
 
@@ -57,6 +83,8 @@ public class AdminApplicationService {
                 .reviewUrl(application.getReviewUrl())
                 .createdAt(application.getCreatedAt())
                 .updatedAt(application.getUpdatedAt())
+                .campaignTitle(campaign.getTitle())
+                .storeName(campaign.getStoreName())
                 .build();
     }
 }

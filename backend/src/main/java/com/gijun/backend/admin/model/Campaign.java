@@ -1,8 +1,8 @@
 package com.gijun.backend.admin.model;
 
 import com.gijun.backend.common.model.BaseTimeEntity;
-import com.gijun.backend.common.model.key.CampaignId;
-import com.gijun.backend.common.model.key.UserId;
+import com.gijun.backend.admin.model.id.CampaignId;
+import com.gijun.backend.common.model.id.UserId;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -49,6 +49,7 @@ public class Campaign extends BaseTimeEntity {
     @AttributeOverrides({
         @AttributeOverride(name = "id", column = @Column(name = "created_by", nullable = false))
     })
+    @Embedded
     private UserId createdBy;
     
     @PrePersist

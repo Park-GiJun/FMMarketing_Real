@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class ApplicationStatusRequest {
     
     @NotBlank(message = "Status is required")
-    private String status;
+    private String status; // APPROVED, REJECTED
     
-    private String reason;
+    private String reason; // Required when status is REJECTED
 }

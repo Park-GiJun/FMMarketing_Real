@@ -1,9 +1,12 @@
 package com.gijun.backend.admin.controller;
 
 import com.gijun.backend.admin.dto.ApplicationStatusRequest;
+import com.gijun.backend.admin.model.id.CampaignId;
 import com.gijun.backend.admin.service.AdminApplicationService;
 import com.gijun.backend.blogger.dto.ApplicationResponse;
+import com.gijun.backend.blogger.model.id.ApplicationId;
 import com.gijun.backend.common.dto.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,15 +21,18 @@ public class AdminApplicationController {
 
     @GetMapping("/campaign/{campaignId}")
     public ApiResponse<Page<ApplicationResponse>> getCampaignApplications(
-            @PathVariable Long campaignId,
+            @PathVariable("campaignId") String campaignId,
             Pageable pageable) {
-        return ApiResponse.success(adminApplicationService.getCampaignApplications(campaignId, pageable));
+        CampaignId id = CampaignId.of(campaignId);
+        return ApiResponse.success(adminApplicationService.getCampaignApplications(id, pageable));
     }
 
     @PutMapping("/{id}/status")
     public ApiResponse<ApplicationResponse> updateApplicationStatus(
-            @PathVariable Long id,
-            @RequestBody ApplicationStatusRequest request) {
-        return ApiResponse.success("Application status updated", adminApplicationService.updateApplicationStatus(id, request));
+            @PathVariable("id") String id,
+            @Valid @RequestBody ApplicationStatusRequest request) {
+        ApplicationId applicationId = ApplicationId.of(id);
+        return ApiResponse.success("Application status updated", 
+            adminApplicationService.updateApplicationStatus(applicationId, request));
     }
 }

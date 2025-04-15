@@ -1,5 +1,6 @@
 package com.gijun.backend.common.security;
 
+import com.gijun.backend.common.service.UserDetailsServiceImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -28,16 +28,27 @@ public class JwtTokenProvider {
     
     private Key key;
     
-    private final UserDetailsService userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
     
-    public JwtTokenProvider(UserDetailsService userDetailsService) {
+    public JwtTokenProvider(UserDetailsServiceImpl userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
     
     @PostConstruct
     public void init() {
+        // If no proper key is provided, generate a stronger one for development
+        if ("default-secret-key-for-development-environment-only".equals(secretKey)) {
+            secretKey = generateStrongKeyForDev();
+        }
+        
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
+    }
+    
+    // Generate a stronger key for development environments
+    private String generateStrongKeyForDev() {
+        byte[] keyBytes = Keys.secretKeyFor(SignatureAlgorithm.HS512).getEncoded();
+        return java.util.Base64.getEncoder().encodeToString(keyBytes);
     }
     
     public String createToken(String username, String role) {

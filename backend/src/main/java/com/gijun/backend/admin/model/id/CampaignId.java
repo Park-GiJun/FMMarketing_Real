@@ -9,7 +9,15 @@ import lombok.NoArgsConstructor;
 public class CampaignId extends BaseId {
     private static final String DOMAIN_TYPE = "CAMPAIGN";
     
+    public CampaignId(String id) {
+        super(id);
+    }
+    
     public static CampaignId generate() {
         return (CampaignId) generateId(DOMAIN_TYPE);
+    }
+    
+    public static CampaignId of(String id) {
+        return new CampaignId(id);
     }
 }

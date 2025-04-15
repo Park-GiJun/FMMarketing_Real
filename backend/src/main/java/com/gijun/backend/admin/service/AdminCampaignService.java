@@ -3,17 +3,17 @@ package com.gijun.backend.admin.service;
 import com.gijun.backend.admin.dto.CampaignRequest;
 import com.gijun.backend.admin.dto.CampaignResponse;
 import com.gijun.backend.admin.model.Campaign;
+import com.gijun.backend.admin.model.id.CampaignId;
 import com.gijun.backend.admin.repository.CampaignRepository;
 import com.gijun.backend.blogger.model.Application;
 import com.gijun.backend.blogger.repository.ApplicationRepository;
 import com.gijun.backend.common.exception.ResourceNotFoundException;
+import com.gijun.backend.common.model.id.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +23,7 @@ public class AdminCampaignService {
     private final ApplicationRepository applicationRepository;
 
     @Transactional
-    public CampaignResponse createCampaign(CampaignRequest request, Long adminId) {
+    public CampaignResponse createCampaign(CampaignRequest request, UserId adminId) {
         Campaign campaign = Campaign.builder()
                 .title(request.getTitle())
                 .content(request.getContent())
@@ -41,8 +41,8 @@ public class AdminCampaignService {
     }
 
     @Transactional(readOnly = true)
-    public CampaignResponse getCampaign(Long campaignId) {
-        Campaign campaign = campaignRepository.findById(campaignId)
+    public CampaignResponse getCampaign(CampaignId campaignId) {
+        Campaign campaign = campaignRepository.findByIdAndDeletedFalse(campaignId)
                 .orElseThrow(() -> new ResourceNotFoundException("Campaign", "id", campaignId));
 
         int appliedCount = applicationRepository.countByCampaignId(campaignId);
@@ -64,8 +64,8 @@ public class AdminCampaignService {
     }
 
     @Transactional
-    public CampaignResponse updateCampaign(Long campaignId, CampaignRequest request) {
-        Campaign campaign = campaignRepository.findById(campaignId)
+    public CampaignResponse updateCampaign(CampaignId campaignId, CampaignRequest request) {
+        Campaign campaign = campaignRepository.findByIdAndDeletedFalse(campaignId)
                 .orElseThrow(() -> new ResourceNotFoundException("Campaign", "id", campaignId));
 
         campaign.setTitle(request.getTitle());
@@ -87,8 +87,8 @@ public class AdminCampaignService {
     }
 
     @Transactional
-    public void deleteCampaign(Long campaignId) {
-        Campaign campaign = campaignRepository.findById(campaignId)
+    public void deleteCampaign(CampaignId campaignId) {
+        Campaign campaign = campaignRepository.findByIdAndDeletedFalse(campaignId)
                 .orElseThrow(() -> new ResourceNotFoundException("Campaign", "id", campaignId));
         
         campaign.setDeleted(true);

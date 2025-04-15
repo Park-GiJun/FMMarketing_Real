@@ -1,5 +1,6 @@
 package com.gijun.backend.admin.dto;
 
+import com.gijun.backend.admin.model.id.CampaignId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CampaignResponse {
-    private Long id;
+    private CampaignId id;
     private String title;
     private String content;
     private String storeName;
