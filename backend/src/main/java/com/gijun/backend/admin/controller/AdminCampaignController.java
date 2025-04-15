@@ -2,9 +2,9 @@ package com.gijun.backend.admin.controller;
 
 import com.gijun.backend.admin.dto.CampaignRequest;
 import com.gijun.backend.admin.dto.CampaignResponse;
-import com.gijun.backend.admin.model.id.CampaignId;
 import com.gijun.backend.admin.service.AdminCampaignService;
 import com.gijun.backend.common.dto.ApiResponse;
+import com.gijun.backend.common.model.id.CampaignId;
 import com.gijun.backend.common.model.id.UserId;
 import com.gijun.backend.common.repository.UserRepository;
 import jakarta.validation.Valid;

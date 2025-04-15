@@ -1,8 +1,8 @@
 package com.gijun.backend.admin.model;
 
 import com.gijun.backend.common.model.BaseTimeEntity;
-import com.gijun.backend.admin.model.id.CampaignId;
 import com.gijun.backend.common.model.id.UserId;
+import com.gijun.backend.common.model.key.CampaignId;
 import jakarta.persistence.*;
 import lombok.*;
 

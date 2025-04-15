@@ -1,6 +1,6 @@
 package com.gijun.backend.admin.dto;
 
-import com.gijun.backend.admin.model.id.CampaignId;
+import com.gijun.backend.common.model.id.CampaignId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

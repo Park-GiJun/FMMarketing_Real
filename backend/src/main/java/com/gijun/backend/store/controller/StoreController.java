@@ -1,8 +1,8 @@
 package com.gijun.backend.store.controller;
 
-import com.gijun.backend.admin.model.id.CampaignId;
 import com.gijun.backend.blogger.dto.ApplicationResponse;
 import com.gijun.backend.common.dto.ApiResponse;
+import com.gijun.backend.common.model.id.CampaignId;
 import com.gijun.backend.common.model.id.UserId;
 import com.gijun.backend.common.repository.UserRepository;
 import com.gijun.backend.store.service.StoreService;

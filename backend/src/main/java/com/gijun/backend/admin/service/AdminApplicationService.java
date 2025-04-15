@@ -1,16 +1,16 @@
 package com.gijun.backend.admin.service;
 
 import com.gijun.backend.admin.dto.ApplicationStatusRequest;
-import com.gijun.backend.admin.model.Campaign;
-import com.gijun.backend.admin.model.id.CampaignId;
-import com.gijun.backend.admin.repository.CampaignRepository;
+import com.gijun.backend.application.model.Application;
+import com.gijun.backend.application.repository.ApplicationRepository;
 import com.gijun.backend.blogger.dto.ApplicationResponse;
-import com.gijun.backend.blogger.model.Application;
-import com.gijun.backend.blogger.model.id.ApplicationId;
-import com.gijun.backend.blogger.repository.ApplicationRepository;
+import com.gijun.backend.campaign.model.Campaign;
+import com.gijun.backend.campaign.repository.CampaignRepository;
 import com.gijun.backend.common.exception.BadRequestException;
 import com.gijun.backend.common.exception.ResourceNotFoundException;
 import com.gijun.backend.common.model.User;
+import com.gijun.backend.common.model.id.ApplicationId;
+import com.gijun.backend.common.model.id.CampaignId;
 import com.gijun.backend.common.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -43,15 +43,15 @@ public class AdminApplicationService {
 
         // Validate status
         try {
-            Application.Status newStatus = Application.Status.valueOf(request.getStatus());
+            Application.ApplicationStatus newStatus = Application.ApplicationStatus.valueOf(request.getStatus());
             
-            if (newStatus == Application.Status.REJECTED && (request.getReason() == null || request.getReason().trim().isEmpty())) {
+            if (newStatus == Application.ApplicationStatus.REJECTED && (request.getReason() == null || request.getReason().trim().isEmpty())) {
                 throw new BadRequestException("Rejection reason is required when rejecting an application");
             }
             
             application.setStatus(newStatus);
             
-            if (newStatus == Application.Status.REJECTED) {
+            if (newStatus == Application.ApplicationStatus.REJECTED) {
                 application.setRejectionReason(request.getReason());
             }
         } catch (IllegalArgumentException e) {

@@ -1,17 +1,17 @@
 package com.gijun.backend.blogger.service;
 
-import com.gijun.backend.admin.model.Campaign;
-import com.gijun.backend.admin.repository.CampaignRepository;
 import com.gijun.backend.application.model.Application;
 import com.gijun.backend.application.repository.ApplicationRepository;
 import com.gijun.backend.blogger.dto.ApplicationRequest;
 import com.gijun.backend.blogger.dto.ApplicationResponse;
 import com.gijun.backend.blogger.dto.ReviewSubmissionRequest;
+import com.gijun.backend.campaign.model.Campaign;
+import com.gijun.backend.campaign.repository.CampaignRepository;
 import com.gijun.backend.common.exception.BadRequestException;
 import com.gijun.backend.common.exception.ResourceNotFoundException;
 import com.gijun.backend.common.model.User;
+import com.gijun.backend.common.model.id.CampaignId;
 import com.gijun.backend.common.model.id.UserId;
-import com.gijun.backend.common.model.key.CampaignId;
 import com.gijun.backend.common.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -40,7 +40,7 @@ public class BloggerService {
         }
         
         // Check if blogger already applied to this campaign
-        if (applicationRepository.findByCampaignIdAndBloggerId(campaignId, bloggerId).isPresent()) {
+        if (applicationRepository.findByBloggerIdAndCampaignId(bloggerId, campaignId).isPresent()) {
             throw new BadRequestException("You have already applied to this campaign");
         }
         
@@ -49,7 +49,7 @@ public class BloggerService {
                 .bloggerId(bloggerId)
                 .blogUrl(request.getBlogUrl())
                 .reason(request.getReason())
-                .status(Application.Status.PENDING)
+                .status(Application.ApplicationStatus.PENDING)
                 .build();
                 
         Application savedApplication = applicationRepository.save(application);
@@ -59,12 +59,12 @@ public class BloggerService {
     
     @Transactional
     public ApplicationResponse submitReview(UserId bloggerId, CampaignId campaignId, ReviewSubmissionRequest request) {
-        Application application = applicationRepository.findByCampaignIdAndBloggerId(campaignId, bloggerId)
+        Application application = applicationRepository.findByBloggerIdAndCampaignId(bloggerId, campaignId)
                 .orElseThrow(() -> new ResourceNotFoundException("Application", "campaignId and bloggerId", 
                     campaignId + " and " + bloggerId));
         
         // Validate application status is APPROVED
-        if (application.getStatus() != Application.Status.APPROVED) {
+        if (application.getStatus() != Application.ApplicationStatus.APPROVED) {
             throw new BadRequestException("Only approved applications can submit reviews");
         }
         
@@ -77,7 +77,7 @@ public class BloggerService {
         }
         
         application.setReviewUrl(request.getReviewUrl());
-        application.setStatus(Application.Status.COMPLETED);
+        application.setStatus(Application.ApplicationStatus.COMPLETED);
         
         Application updatedApplication = applicationRepository.save(application);
         return convertToResponse(updatedApplication, campaign);

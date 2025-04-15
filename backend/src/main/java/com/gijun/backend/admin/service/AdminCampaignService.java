@@ -2,12 +2,12 @@ package com.gijun.backend.admin.service;
 
 import com.gijun.backend.admin.dto.CampaignRequest;
 import com.gijun.backend.admin.dto.CampaignResponse;
-import com.gijun.backend.admin.model.Campaign;
-import com.gijun.backend.admin.model.id.CampaignId;
-import com.gijun.backend.admin.repository.CampaignRepository;
-import com.gijun.backend.blogger.model.Application;
-import com.gijun.backend.blogger.repository.ApplicationRepository;
+import com.gijun.backend.application.model.Application;
+import com.gijun.backend.application.repository.ApplicationRepository;
+import com.gijun.backend.campaign.model.Campaign;
+import com.gijun.backend.campaign.repository.CampaignRepository;
 import com.gijun.backend.common.exception.ResourceNotFoundException;
+import com.gijun.backend.common.model.id.CampaignId;
 import com.gijun.backend.common.model.id.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -46,8 +46,8 @@ public class AdminCampaignService {
                 .orElseThrow(() -> new ResourceNotFoundException("Campaign", "id", campaignId));
 
         int appliedCount = applicationRepository.countByCampaignId(campaignId);
-        int approvedCount = applicationRepository.countByCampaignIdAndStatus(campaignId, Application.Status.APPROVED);
-        int reviewCount = applicationRepository.countByCampaignIdAndStatusAndReviewUrlIsNotNull(campaignId, Application.Status.APPROVED);
+        int approvedCount = applicationRepository.countByCampaignIdAndStatus(campaignId, Application.ApplicationStatus.APPROVED);
+        int reviewCount = applicationRepository.countByCampaignIdAndStatusAndReviewUrlIsNotNull(campaignId, Application.ApplicationStatus.APPROVED);
 
         return convertToResponse(campaign, appliedCount, approvedCount, reviewCount);
     }
@@ -57,8 +57,8 @@ public class AdminCampaignService {
         Page<Campaign> campaigns = campaignRepository.findByDeletedFalse(pageable);
         return campaigns.map(campaign -> {
             int appliedCount = applicationRepository.countByCampaignId(campaign.getId());
-            int approvedCount = applicationRepository.countByCampaignIdAndStatus(campaign.getId(), Application.Status.APPROVED);
-            int reviewCount = applicationRepository.countByCampaignIdAndStatusAndReviewUrlIsNotNull(campaign.getId(), Application.Status.APPROVED);
+            int approvedCount = applicationRepository.countByCampaignIdAndStatus(campaign.getId(), Application.ApplicationStatus.APPROVED);
+            int reviewCount = applicationRepository.countByCampaignIdAndStatusAndReviewUrlIsNotNull(campaign.getId(), Application.ApplicationStatus.APPROVED);
             return convertToResponse(campaign, appliedCount, approvedCount, reviewCount);
         });
     }
@@ -80,8 +80,8 @@ public class AdminCampaignService {
         Campaign updatedCampaign = campaignRepository.save(campaign);
 
         int appliedCount = applicationRepository.countByCampaignId(campaignId);
-        int approvedCount = applicationRepository.countByCampaignIdAndStatus(campaignId, Application.Status.APPROVED);
-        int reviewCount = applicationRepository.countByCampaignIdAndStatusAndReviewUrlIsNotNull(campaignId, Application.Status.APPROVED);
+        int approvedCount = applicationRepository.countByCampaignIdAndStatus(campaignId, Application.ApplicationStatus.APPROVED);
+        int reviewCount = applicationRepository.countByCampaignIdAndStatusAndReviewUrlIsNotNull(campaignId, Application.ApplicationStatus.APPROVED);
 
         return convertToResponse(updatedCampaign, appliedCount, approvedCount, reviewCount);
     }
@@ -96,21 +96,6 @@ public class AdminCampaignService {
     }
 
     private CampaignResponse convertToResponse(Campaign campaign, int appliedCount, int approvedCount, int reviewCount) {
-        return CampaignResponse.builder()
-                .id(campaign.getId())
-                .title(campaign.getTitle())
-                .content(campaign.getContent())
-                .storeName(campaign.getStoreName())
-                .storeAddress(campaign.getStoreAddress())
-                .applicationDeadline(campaign.getApplicationDeadline())
-                .reviewDeadline(campaign.getReviewDeadline())
-                .requiredBloggerCount(campaign.getRequiredBloggerCount())
-                .imageUrl(campaign.getImageUrl())
-                .createdAt(campaign.getCreatedAt())
-                .updatedAt(campaign.getUpdatedAt())
-                .appliedCount(appliedCount)
-                .approvedCount(approvedCount)
-                .reviewCount(reviewCount)
-                .build();
+        return getCampaignResponse(campaign, appliedCount, approvedCount, reviewCount);
     }
 }

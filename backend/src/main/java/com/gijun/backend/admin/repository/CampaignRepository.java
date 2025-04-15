@@ -1,7 +1,7 @@
 package com.gijun.backend.admin.repository;
 
 import com.gijun.backend.admin.model.Campaign;
-import com.gijun.backend.admin.model.id.CampaignId;
+import com.gijun.backend.common.model.key.CampaignId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

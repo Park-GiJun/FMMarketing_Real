@@ -1,11 +1,11 @@
 package com.gijun.backend.admin.controller;
 
 import com.gijun.backend.admin.dto.ApplicationStatusRequest;
-import com.gijun.backend.admin.model.id.CampaignId;
 import com.gijun.backend.admin.service.AdminApplicationService;
 import com.gijun.backend.blogger.dto.ApplicationResponse;
-import com.gijun.backend.blogger.model.id.ApplicationId;
 import com.gijun.backend.common.dto.ApiResponse;
+import com.gijun.backend.common.model.id.ApplicationId;
+import com.gijun.backend.common.model.id.CampaignId;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

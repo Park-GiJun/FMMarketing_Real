@@ -1,8 +1,8 @@
 package com.gijun.backend.blogger.dto;
 
+import com.gijun.backend.common.model.id.CampaignId;
 import com.gijun.backend.common.model.id.UserId;
 import com.gijun.backend.common.model.key.ApplicationId;
-import com.gijun.backend.common.model.key.CampaignId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
