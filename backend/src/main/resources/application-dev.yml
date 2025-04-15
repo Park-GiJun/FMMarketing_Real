@@ -1,0 +1,36 @@
+spring:
+  # Development DataSource Configuration
+  datasource:
+    url: jdbc:mysql://dev-mysql:3306/fm_marketing?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  
+  # Development JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+  
+  # Development Redis Configuration
+  data:
+    redis:
+      host: dev-redis
+      port: 6379
+  
+  # Development Kafka Configuration
+  kafka:
+    bootstrap-servers: dev-kafka:9092
+
+# Development JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:dev_environment_secret_key_please_change_in_production}
+
+# Development Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.gijun.backend: INFO
+    org.hibernate.SQL: DEBUG

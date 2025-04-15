@@ -1,0 +1,41 @@
+spring:
+  # Production DataSource Configuration
+  datasource:
+    url: jdbc:mysql://${DB_HOST}:3306/fm_marketing?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  
+  # Production JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: false
+        show_sql: false
+  
+  # Production Redis Configuration
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+  
+  # Production Kafka Configuration
+  kafka:
+    bootstrap-servers: ${KAFKA_SERVERS:kafka:9092}
+
+# Production JWT Configuration
+jwt:
+  secret: ${JWT_SECRET}
+
+# Production Logging Configuration
+logging:
+  level:
+    root: ERROR
+    com.gijun.backend: WARN
+  file:
+    name: /var/log/fm-marketing/application.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 7

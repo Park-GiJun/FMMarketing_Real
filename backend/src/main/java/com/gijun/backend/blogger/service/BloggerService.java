@@ -1,17 +1,17 @@
 package com.gijun.backend.blogger.service;
 
 import com.gijun.backend.admin.model.Campaign;
-import com.gijun.backend.admin.model.id.CampaignId;
 import com.gijun.backend.admin.repository.CampaignRepository;
+import com.gijun.backend.application.model.Application;
+import com.gijun.backend.application.repository.ApplicationRepository;
 import com.gijun.backend.blogger.dto.ApplicationRequest;
 import com.gijun.backend.blogger.dto.ApplicationResponse;
 import com.gijun.backend.blogger.dto.ReviewSubmissionRequest;
-import com.gijun.backend.blogger.model.Application;
-import com.gijun.backend.blogger.repository.ApplicationRepository;
 import com.gijun.backend.common.exception.BadRequestException;
 import com.gijun.backend.common.exception.ResourceNotFoundException;
 import com.gijun.backend.common.model.User;
 import com.gijun.backend.common.model.id.UserId;
+import com.gijun.backend.common.model.key.CampaignId;
 import com.gijun.backend.common.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

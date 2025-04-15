@@ -1,0 +1,42 @@
+spring:
+  # Local DataSource Configuration
+  datasource:
+    url: jdbc:mysql://localhost:3306/fm_marketing?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+  
+  # Local JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+  
+  # Local Redis Configuration
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  
+  # Local Kafka Configuration
+  kafka:
+    bootstrap-servers: localhost:9092
+
+# Local JWT Configuration
+jwt:
+  secret: local_development_secret_key_please_change_in_production
+
+# Local Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.gijun.backend: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+# H2 Console for Local Development
+spring.h2.console:
+  enabled: true
+  path: /h2-console

@@ -1,12 +1,12 @@
 package com.gijun.backend.blogger.controller;
 
-import com.gijun.backend.admin.model.id.CampaignId;
 import com.gijun.backend.blogger.dto.ApplicationRequest;
 import com.gijun.backend.blogger.dto.ApplicationResponse;
 import com.gijun.backend.blogger.dto.ReviewSubmissionRequest;
 import com.gijun.backend.blogger.service.BloggerService;
 import com.gijun.backend.common.dto.ApiResponse;
 import com.gijun.backend.common.model.id.UserId;
+import com.gijun.backend.common.model.key.CampaignId;
 import com.gijun.backend.common.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -1,8 +1,19 @@
 spring:
+  application:
+    name: fm-marketing-backend
+  
+  # Common Profile Configuration
   profiles:
-    active: local
+    active: local # default profile
+    
+  # Common JPA Configuration
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
 
-  # DataSource Configuration
+  # Common DataSource Configuration
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
@@ -11,27 +22,13 @@ spring:
       idle-timeout: 600000
       max-lifetime: 1800000
 
-  # JPA Configuration
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    properties:
-      hibernate:
-        format_sql: true
-        show_sql: true
-        dialect: org.hibernate.dialect.MySQLDialect
-    open-in-view: false
-
-  # Redis Configuration
+  # Common Redis Configuration
   data:
     redis:
-      host: localhost
-      port: 6379
       timeout: 10s
 
-  # Kafka Configuration
+  # Common Kafka Configuration
   kafka:
-    bootstrap-servers: localhost:9092
     consumer:
       group-id: fm-marketing
       auto-offset-reset: earliest
@@ -41,80 +38,14 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
-# JWT Configuration
+# Common JWT Configuration
 jwt:
-  secret: ${JWT_SECRET:VlpJfjvtZ4d8x8T5OpxjJYJNKjqUPzCnIjcSJh7/jrH48SwLdecOz0nH/JYRYZCg}
   token-validity-in-seconds: 86400
 
-# Server Configuration
+# Common Server Configuration
 server:
   port: 8080
   servlet:
     context-path: /
   error:
     include-stacktrace: never
-
----
-# Local Environment
-spring:
-  config:
-    activate:
-      on-profile: local
-  
-  datasource:
-    url: jdbc:mysql://localhost:3306/fm_marketing?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: root
-    password: root
-  
-  jpa:
-    hibernate:
-      ddl-auto: update
-
-logging:
-  level:
-    root: INFO
-    com.gijun.backend: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-
----
-# Development Environment
-spring:
-  config:
-    activate:
-      on-profile: dev
-  
-  datasource:
-    url: jdbc:mysql://dev-mysql:3306/fm_marketing?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-
-logging:
-  level:
-    root: INFO
-    com.gijun.backend: INFO
-
----
-# Production Environment
-spring:
-  config:
-    activate:
-      on-profile: prod
-  
-  datasource:
-    url: jdbc:mysql://${DB_HOST}:3306/fm_marketing?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-  
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    properties:
-      hibernate:
-        format_sql: false
-        show_sql: false
-
-logging:
-  level:
-    root: ERROR
-    com.gijun.backend: WARN
