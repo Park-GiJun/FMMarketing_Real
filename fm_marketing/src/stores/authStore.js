@@ -1,7 +1,12 @@
 import { create } from 'zustand';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+// 모의 사용자 데이터
+const mockUsers = [
+  { id: 1, email: 'admin@fmmarketing.com', password: 'admin123', name: '관리자', role: 'ROLE_ADMIN' },
+  { id: 2, email: 'blogger@example.com', password: 'blogger123', name: '블로거', role: 'ROLE_BLOGGER' },
+  { id: 3, email: 'store@example.com', password: 'store123', name: '매장관리자', role: 'ROLE_STORE' },
+];
 
 export const useAuthStore = create((set, get) => ({
   user: null,
@@ -12,24 +17,41 @@ export const useAuthStore = create((set, get) => ({
 
   login: async (email, password) => {
     set({ isLoading: true, error: null });
+    
+    // 잠시 대기하여 로딩 상태 확인 가능
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, { email, password });
-      const { data } = response.data;
+      // 사용자 인증 로직 (모의)
+      const user = mockUsers.find(u => u.email === email && u.password === password);
       
-      // Store token in localStorage
-      localStorage.setItem('token', data.token);
+      if (!user) {
+        throw new Error('이메일 또는 비밀번호가 올바르지 않습니다.');
+      }
       
-      // Configure axios defaults for future requests
-      axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+      // 가상 토큰 생성
+      const token = `mock_token_${user.id}_${Date.now()}`;
+      
+      // localStorage에 토큰 저장
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role
+      }));
+      
+      // axios 기본 헤더 설정
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       
       set({ 
         user: {
-          id: data.id,
-          email: data.email,
-          name: data.name,
-          role: data.role
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role
         },
-        token: data.token,
+        token: token,
         isAuthenticated: true,
         isLoading: false
       });
@@ -38,7 +60,7 @@ export const useAuthStore = create((set, get) => ({
     } catch (error) {
       console.error('Login error:', error);
       set({ 
-        error: error.response?.data?.message || 'Failed to login. Please check your credentials.',
+        error: error.message || '로그인에 실패했습니다. 자격 증명을 확인하세요.',
         isLoading: false
       });
       return false;
@@ -46,10 +68,11 @@ export const useAuthStore = create((set, get) => ({
   },
 
   logout: () => {
-    // Remove token from localStorage
+    // localStorage에서 토큰 제거
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     
-    // Remove Authorization header
+    // axios 헤더에서 인증 정보 제거
     delete axios.defaults.headers.common['Authorization'];
     
     set({ 
@@ -66,20 +89,28 @@ export const useAuthStore = create((set, get) => ({
       return false;
     }
 
-    // Set Authorization header
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    // localStorage에서 사용자 정보 가져오기
+    const userStr = localStorage.getItem('user');
+    if (!userStr) {
+      get().logout();
+      return false;
+    }
     
     try {
-      // Validate the token by making a request to a protected endpoint
-      const response = await axios.get(`${API_URL}/auth/me`);
-      const { data } = response.data;
+      const user = JSON.parse(userStr);
+      
+      // token 확인 (실제로는 백엔드에서 검증)
+      // 여기서는 시연을 위해 항상 유효한 것으로 처리
+      
+      // axios 기본 헤더 설정
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       
       set({
         user: {
-          id: data.id,
-          email: data.email,
-          name: data.name,
-          role: data.role
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role
         },
         isAuthenticated: true
       });
@@ -87,16 +118,51 @@ export const useAuthStore = create((set, get) => ({
       return true;
     } catch (error) {
       console.error('Token validation error:', error);
-      // If token is invalid, logout
+      // 토큰이 유효하지 않으면 로그아웃
       get().logout();
       return false;
     }
   },
 
+  // 개발용: 특정 역할로 빠른 로그인
+  devLogin: (role) => {
+    const user = mockUsers.find(u => u.role === role);
+    if (!user) return false;
+    
+    // 가상 토큰 생성
+    const token = `mock_token_${user.id}_${Date.now()}`;
+    
+    // localStorage에 토큰 저장
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role
+    }));
+    
+    // axios 기본 헤더 설정
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    
+    set({ 
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role
+      },
+      token: token,
+      isAuthenticated: true,
+      isLoading: false
+    });
+    
+    return true;
+  },
+
   clearError: () => set({ error: null })
 }));
 
-// Initialize axios with token if it exists
+// 초기화: 저장된 토큰이 있으면 axios 헤더에 설정
 const token = localStorage.getItem('token');
 if (token) {
   axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
